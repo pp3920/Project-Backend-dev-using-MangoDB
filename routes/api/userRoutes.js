@@ -5,11 +5,11 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
-const User = require("../model/User");
+const User = require("../../models/User");
 
 
 // REGISTER ROUTE
-router.post("/api/user/register", async (req, res) => {
+router.post("/register", async (req, res) => {
 
     try {
 
@@ -51,7 +51,7 @@ router.post("/api/user/register", async (req, res) => {
 
 
 // LOGIN ROUTE
-router.post("/api/user/login", async (req, res) => {
+router.post("/login", async (req, res) => {
 
     try {
 

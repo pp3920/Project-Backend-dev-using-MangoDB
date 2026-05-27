@@ -1,7 +1,8 @@
-import { Schema, model } from "mongoose";
-import bcrypt from "bcrypt";
- 
-const userSchema = new Schema({
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
+// Humne yahan new mongoose.Schema kiya hai
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -20,17 +21,21 @@ const userSchema = new Schema({
     minlength: 8,
   },
 });
- 
-// Set up pre-save middleware to create password
+
+// Set up pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("password")) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
   }
- 
-  next();
 });
- 
-const User = model("User", userSchema);
- 
-export default User;
+
+// Login ke liye password verification method
+userSchema.methods.isCorrectPassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+// Humne yahan mongoose.model use kiya hai aur end me 'exports' theek kiya hai
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

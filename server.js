@@ -1,43 +1,53 @@
-const User = require("./models/User")
-const express = require("express")
-require("dotenv").config()
-const passport = require("passport")
-require("./config/passport")
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-const app = express()
+const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const PORT = process.env.PORT || 7777
 
-app.use(express.json())
+const Signup = require ("./routes/api/userRoutes")
+const projectRouter = require("./routes/api/projectRoutes")
 
-// Our Default route! Right now...
-app.get('/',(req, res) =>{
-  const {token} = req.query // we check for a Token
-  token ? res.send("We have a token! Check the URL at the top!") : res.send("No token!") // and send different information based on if there is a token or not
-})
 
-app.get( // we have a route that will Send them to authenticate with gitHub
-  '/auth/github',
-  passport.authenticate('github', { scope: ['user:email'] }) // Request email scope (and actually send them to GitHub to sign in)
-);
+const app = express();
 
-// The callback route that GitHub will redirect to after the user approves.
-app.get(
-'/auth/github/callback',
-  passport.authenticate('github', {
-    failureRedirect: '/login', // Where to redirect if user denies
-    session: false // We are using tokens, not sessions
-  }),
-  (req, res) => {
-    // At this point, `req.user` is the user profile returned from the verify callback.
-    // We can now issue our own JWT to the user.
-    const FAKE_TOKEN = "here-is-where-our-token-would-go-if-mongo-cooperated";
-    // Redirect the user to the frontend with the token, or send it in the response
-    // res.redirect(\`\$FRONTEND_REDIRECT_URL=?token=\${FAKE_TOKEN}\`);
-	res.send(`Token would go here: ${FAKE_TOKEN}`);
-  }
-);
+// ===============================
+// Middleware
+// ===============================
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(PORT, () =>{
-    console.log("Listening! "+ PORT)
-})
+// ===============================
+// Routes
+// ===============================
+app.use("/api/Signup", Signup)
+app.use("/api/projects", projectRouter);
+
+// ===============================
+// Default Route
+// ===============================
+app.get("/", (req, res) => {
+  res.json({ message: "Server is running..." });
+});
+
+// ===============================
+// MongoDB Connection
+// ===============================
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB connected successfully");
+
+    // ===============================
+    // Start Server
+    // ===============================
+    const PORT = process.env.PORT || 3001;
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDB connection error:", error);
+  });
