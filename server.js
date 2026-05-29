@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const Signup = require ("./routes/api/userRoutes")
 const projectRouter = require("./routes/api/projectRoutes")
+const taskRouter = require("./routes/api/taskRoutes");
 
 
 const app = express();
@@ -23,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 // ===============================
 app.use("/api/Signup", Signup)
 app.use("/api/projects", projectRouter);
+app.use("/api", taskRouter);
+
 
 // ===============================
 // Default Route

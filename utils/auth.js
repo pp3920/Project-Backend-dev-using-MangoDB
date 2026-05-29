@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const secret = process.env.JWT_SECRET;
-const expiration = "2h";
+const expiration = "10h";
 
 const signToken = ({ _id, username, email }) => {
   const payload = { _id, username, email };
@@ -12,7 +12,6 @@ const signToken = ({ _id, username, email }) => {
 };
 
 const authMiddleware = (req, res, next) => {
-
   // A token is header.payload.signature
 
   // Checks to see if the token was sent in the request
@@ -28,7 +27,7 @@ const authMiddleware = (req, res, next) => {
 
   // Check if the token is expired.
   try {
-    const { data } = jwt.verify(token, secret, {
+    const  data  = jwt.verify(token, secret, {
       maxAge: expiration,
     });
 

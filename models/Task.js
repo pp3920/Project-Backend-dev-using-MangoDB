@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
  
 const taskSchema = new Schema({
@@ -27,7 +28,7 @@ const taskSchema = new Schema({
 
 });
  
+const Task = mongoose.model("Task", taskSchema);
 
-const Task = model("Task", taskSchema);
- 
-module.export = Task;
+// export default ki jagah module.exports use karo
+module.exports = Task;

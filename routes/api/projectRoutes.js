@@ -1,3 +1,5 @@
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const router = require("express").Router();
 const { authMiddleware } = require("../../utils/auth");
 const Project = require("../../models/Project");
@@ -6,11 +8,12 @@ const Project = require("../../models/Project");
 // CREATE PROJECT
 // POST /api/projects
 // ===============================
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware , async (req, res) => {
   try {
+    console.log(req.user);
     const project = await Project.create({
       ...req.body,
-      owner: req.user._id, // Logged-in user ID
+      user: req.user._id, // Logged-in user ID   // _id: '6a17266a66a8d391e679f110',
     });
 
     res.status(201).json(project);
@@ -26,7 +29,7 @@ router.post("/", authMiddleware, async (req, res) => {
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const projects = await Project.find({
-      owner: req.user._id,
+      user: req.user._id,
     });
 
     res.json(projects);
@@ -43,7 +46,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const project = await Project.findOne({
       _id: req.params.id,
-      owner: req.user._id,
+      user: req.user._id,
     });
 
     if (!project) {
@@ -67,7 +70,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
     const updatedProject = await Project.findOneAndUpdate(
       {
         _id: req.params.id,
-        owner: req.user._id,
+        user: req.user._id,
       },
       req.body,
       {
@@ -96,7 +99,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const deletedProject = await Project.findOneAndDelete({
       _id: req.params.id,
-      owner: req.user._id,
+      user: req.user._id,
     });
 
     if (!deletedProject) {
